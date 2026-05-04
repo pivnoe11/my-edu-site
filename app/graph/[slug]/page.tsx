@@ -82,7 +82,16 @@ export default async function TopicGraphPage({
 
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h1 className="text-4xl font-bold md:text-5xl">{topic.title}</h1>
+            <Link
+              href={topic.section.href}
+              className="inline-flex rounded-full border border-green-700/30 bg-green-50 px-4 py-2 text-sm font-medium text-green-900 transition hover:border-green-800 hover:bg-green-100"
+            >
+              Раздел: {topic.section.title}
+            </Link>
+
+            <h1 className="mt-4 text-4xl font-bold md:text-5xl">
+              {topic.title}
+            </h1>
 
             <p className="mt-4 max-w-3xl text-lg text-gray-600">
               {topic.description}
