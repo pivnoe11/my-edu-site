@@ -1,6 +1,18 @@
 import Navbar from "../../components/Navbar";
+import { signInAction } from "../auth/actions";
 
-export default function SignInPage() {
+type SignInPageProps = {
+  searchParams?: Promise<{
+    error?: string;
+    registered?: string;
+  }>;
+};
+
+export default async function SignInPage({ searchParams }: SignInPageProps) {
+  const params = await searchParams;
+  const error = params?.error;
+  const registered = params?.registered === "1";
+
   return (
     <main className="min-h-screen bg-gray-50 text-black">
       <Navbar />
@@ -12,12 +24,27 @@ export default function SignInPage() {
             Войди в аккаунт, чтобы продолжить обучение.
           </p>
 
-          <form className="mt-8 space-y-4">
+          {registered ? (
+            <div className="mt-6 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+              Аккаунт создан. Если в Supabase включено подтверждение email,
+              проверьте почту перед входом.
+            </div>
+          ) : null}
+
+          {error ? (
+            <div className="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {error}
+            </div>
+          ) : null}
+
+          <form action={signInAction} className="mt-8 space-y-4">
             <div>
               <label className="mb-2 block text-sm font-medium">Email</label>
               <input
+                name="email"
                 type="email"
                 placeholder="you@example.com"
+                required
                 className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-black"
               />
             </div>
@@ -25,13 +52,18 @@ export default function SignInPage() {
             <div>
               <label className="mb-2 block text-sm font-medium">Пароль</label>
               <input
+                name="password"
                 type="password"
                 placeholder="Введите пароль"
+                required
                 className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-black"
               />
             </div>
 
-            <button className="w-full rounded-xl bg-black px-4 py-3 text-white hover:opacity-90">
+            <button
+              type="submit"
+              className="w-full rounded-xl bg-black px-4 py-3 text-white hover:opacity-90"
+            >
               Войти
             </button>
           </form>

@@ -1,6 +1,16 @@
 import Navbar from "../../components/Navbar";
+import { signUpAction } from "../auth/actions";
 
-export default function SignUpPage() {
+type SignUpPageProps = {
+  searchParams?: Promise<{
+    error?: string;
+  }>;
+};
+
+export default async function SignUpPage({ searchParams }: SignUpPageProps) {
+  const params = await searchParams;
+  const error = params?.error;
+
   return (
     <main className="min-h-screen bg-gray-50 text-black">
       <Navbar />
@@ -12,12 +22,20 @@ export default function SignUpPage() {
             Создай аккаунт, чтобы сохранять прогресс.
           </p>
 
-          <form className="mt-8 space-y-4">
+          {error ? (
+            <div className="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {error}
+            </div>
+          ) : null}
+
+          <form action={signUpAction} className="mt-8 space-y-4">
             <div>
               <label className="mb-2 block text-sm font-medium">Имя</label>
               <input
+                name="name"
                 type="text"
                 placeholder="Ваше имя"
+                required
                 className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-black"
               />
             </div>
@@ -25,8 +43,10 @@ export default function SignUpPage() {
             <div>
               <label className="mb-2 block text-sm font-medium">Email</label>
               <input
+                name="email"
                 type="email"
                 placeholder="you@example.com"
+                required
                 className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-black"
               />
             </div>
@@ -34,13 +54,19 @@ export default function SignUpPage() {
             <div>
               <label className="mb-2 block text-sm font-medium">Пароль</label>
               <input
+                name="password"
                 type="password"
                 placeholder="Придумайте пароль"
+                required
+                minLength={6}
                 className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-black"
               />
             </div>
 
-            <button className="w-full rounded-xl bg-black px-4 py-3 text-white hover:opacity-90">
+            <button
+              type="submit"
+              className="w-full rounded-xl bg-black px-4 py-3 text-white hover:opacity-90"
+            >
               Зарегистрироваться
             </button>
           </form>

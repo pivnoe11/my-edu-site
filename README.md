@@ -16,6 +16,23 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## Auth setup
+
+Registration and login use Supabase Auth. Create a Supabase project, then add
+these variables locally in `.env.local` and in Vercel Project Settings:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-publishable-key
+NEXT_PUBLIC_SITE_URL=https://my-edu-site-tan.vercel.app
+```
+
+In Supabase Auth URL settings, add this redirect URL:
+
+```text
+https://my-edu-site-tan.vercel.app/auth/confirm
+```
+
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
