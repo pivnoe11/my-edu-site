@@ -23,7 +23,7 @@ export default function SectionsPage() {
           {sections.map((section) => (
             <Link
               key={section.slug}
-              href={`/sections/${section.slug}`}
+              href={`/${section.slug}`}
               className="group rounded-3xl border border-gray-200 bg-white px-8 py-8 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
             >
               <div className="flex items-center justify-between">

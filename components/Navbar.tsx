@@ -17,14 +17,14 @@ export default function Navbar() {
           </Link>
 
           <Link
-            href="/login"
+            href="/sign-in"
             className="text-gray-600 transition hover:text-black"
           >
             Войти
           </Link>
 
           <Link
-            href="/register"
+            href="/sign-up"
             className="rounded-xl bg-black px-5 py-2 text-white transition hover:bg-gray-800"
           >
             Регистрация
