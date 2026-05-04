@@ -14,6 +14,13 @@ create policy "Users can read their own profile"
   for select
   using ((select auth.uid()) = id);
 
+drop policy if exists "Users can insert their own profile" on public.profiles;
+
+create policy "Users can insert their own profile"
+  on public.profiles
+  for insert
+  with check ((select auth.uid()) = id);
+
 drop policy if exists "Users can update their own profile" on public.profiles;
 
 create policy "Users can update their own profile"
