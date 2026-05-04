@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import Navbar from "../../components/Navbar";
-import { signOutAction, updateProfileAction } from "../auth/actions";
+import ProfileNameEditor from "../../components/ProfileNameEditor";
+import { signOutAction } from "../auth/actions";
 import { createClient } from "@/lib/supabase/server";
 
 type Profile = {
@@ -129,8 +130,7 @@ export default async function DashboardPage({
 
             <dl className="mt-6 grid gap-4 sm:grid-cols-2">
               <div className="rounded-2xl border border-gray-200 p-4">
-                <dt className="text-sm text-gray-500">Имя</dt>
-                <dd className="mt-1 text-lg font-semibold">{displayName}</dd>
+                <ProfileNameEditor displayName={displayName} />
               </div>
 
               <div className="rounded-2xl border border-gray-200 p-4">
@@ -155,34 +155,6 @@ export default async function DashboardPage({
               </div>
             </dl>
 
-            <form
-              action={updateProfileAction}
-              className="mt-6 rounded-2xl border border-gray-200 bg-gray-50 p-4"
-            >
-              <label
-                htmlFor="full_name"
-                className="block text-sm font-medium text-gray-600"
-              >
-                Изменить имя
-              </label>
-              <div className="mt-3 flex flex-col gap-3 sm:flex-row">
-                <input
-                  id="full_name"
-                  name="full_name"
-                  type="text"
-                  defaultValue={displayName}
-                  required
-                  maxLength={40}
-                  className="min-w-0 flex-1 rounded-xl border border-gray-300 bg-white px-4 py-3 outline-none transition focus:border-black"
-                />
-                <button
-                  type="submit"
-                  className="rounded-xl bg-black px-5 py-3 font-medium text-white transition hover:bg-gray-800"
-                >
-                  Сохранить
-                </button>
-              </div>
-            </form>
           </section>
 
           <section className="rounded-3xl bg-black p-6 text-white shadow-sm">
