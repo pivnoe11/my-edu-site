@@ -145,3 +145,40 @@ export async function updateProfileAction(formData: FormData) {
 
   redirect("/dashboard?updated=1");
 }
+
+export async function completeTopicAction(formData: FormData) {
+  const topicSlug = getString(formData, "topic_slug");
+
+  if (!topicSlug) {
+    redirect("/mechanics");
+  }
+
+  const supabase = await createClient();
+
+  if (!supabase) {
+    redirect(`/graph/${topicSlug}`);
+  }
+
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    redirect("/sign-in");
+  }
+
+  await supabase.from("user_topic_progress").upsert(
+    {
+      user_id: user.id,
+      topic_slug: topicSlug,
+      status: "completed",
+      last_opened_at: new Date().toISOString(),
+    },
+    {
+      onConflict: "user_id,topic_slug",
+    }
+  );
+
+  redirect(`/graph/${topicSlug}?completed=1`);
+}

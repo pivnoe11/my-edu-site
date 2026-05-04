@@ -1,14 +1,19 @@
 import Link from "next/link";
 import Navbar from "../../../components/Navbar";
+import { completeTopicAction } from "../../auth/actions";
 import { createClient } from "../../../lib/supabase/server";
 import { getTopicBySlug } from "../../../lib/topics";
 
 export default async function TopicGraphPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams?: Promise<{ completed?: string }>;
 }) {
   const { slug } = await params;
+  const query = await searchParams;
+  const wasJustCompleted = query?.completed === "1";
   const topic = getTopicBySlug(slug);
 
   if (!topic) {
@@ -36,13 +41,22 @@ export default async function TopicGraphPage({
     : { data: { user: null } };
 
   let progressSaved = false;
+  let isCompleted = false;
 
   if (supabase && user) {
+    const { data: existingProgress } = await supabase
+      .from("user_topic_progress")
+      .select("status")
+      .eq("user_id", user.id)
+      .eq("topic_slug", topic.slug)
+      .maybeSingle<{ status: string }>();
+    const status =
+      existingProgress?.status === "completed" ? "completed" : "started";
     const { error } = await supabase.from("user_topic_progress").upsert(
       {
         user_id: user.id,
         topic_slug: topic.slug,
-        status: "started",
+        status,
         last_opened_at: new Date().toISOString(),
       },
       {
@@ -51,6 +65,7 @@ export default async function TopicGraphPage({
     );
 
     progressSaved = !error;
+    isCompleted = status === "completed" || wasJustCompleted;
   }
 
   return (
@@ -74,11 +89,33 @@ export default async function TopicGraphPage({
             </p>
           </div>
 
-          {progressSaved ? (
-            <div className="rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-800">
-              Прогресс сохранён
-            </div>
-          ) : null}
+          <div className="flex flex-col items-start gap-3">
+            {progressSaved ? (
+              <div className="rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-800">
+                {isCompleted ? "Тема завершена" : "Прогресс сохранён"}
+              </div>
+            ) : null}
+
+            {user ? (
+              <form action={completeTopicAction}>
+                <input type="hidden" name="topic_slug" value={topic.slug} />
+                <button
+                  type="submit"
+                  className="rounded-xl bg-black px-5 py-3 font-medium text-white transition hover:bg-gray-800 disabled:cursor-default disabled:bg-gray-400"
+                  disabled={isCompleted}
+                >
+                  {isCompleted ? "Тема завершена" : "Завершить тему"}
+                </button>
+              </form>
+            ) : (
+              <Link
+                href="/sign-in"
+                className="rounded-xl bg-black px-5 py-3 font-medium text-white transition hover:bg-gray-800"
+              >
+                Войти, чтобы сохранить прогресс
+              </Link>
+            )}
+          </div>
         </div>
 
         <div className="mt-10 rounded-3xl border border-dashed border-green-700/40 bg-white p-10 shadow-sm">
@@ -90,4 +127,3 @@ export default async function TopicGraphPage({
     </main>
   );
 }
-

@@ -79,8 +79,11 @@ export default async function DashboardPage({
 
   const startedTopics = topicProgress ?? [];
   const startedTopicCount = startedTopics.length;
+  const completedTopicCount = startedTopics.filter(
+    (topic) => topic.status === "completed"
+  ).length;
   const progressPercent = Math.round(
-    (startedTopicCount / mechanicsTopics.length) * 100
+    (completedTopicCount / mechanicsTopics.length) * 100
   );
   const currentTopic =
     startedTopics.length > 0
@@ -157,6 +160,16 @@ export default async function DashboardPage({
               </div>
 
               <div className="rounded-2xl bg-white/10 p-4">
+                <p className="text-sm text-gray-300">Завершено тем</p>
+                <p className="mt-1 text-3xl font-bold">
+                  {completedTopicCount}
+                </p>
+                <p className="mt-1 text-sm text-gray-400">
+                  из {mechanicsTopics.length}
+                </p>
+              </div>
+
+              <div className="rounded-2xl bg-white/10 p-4">
                 <p className="text-sm text-gray-300">Текущая тема</p>
                 <p className="mt-1 text-lg font-semibold">{currentTopic}</p>
               </div>
@@ -176,7 +189,8 @@ export default async function DashboardPage({
                     key={item.topic_slug}
                     className="rounded-2xl border border-gray-200 p-4 text-gray-700"
                   >
-                    Открыта тема «{topic?.title ?? item.topic_slug}»
+                    {item.status === "completed" ? "Завершена" : "Открыта"}{" "}
+                    тема «{topic?.title ?? item.topic_slug}»
                   </li>
                 );
               })}
