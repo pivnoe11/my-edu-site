@@ -36,6 +36,9 @@ https://my-edu-site-tan.vercel.app/auth/confirm
 To enable stored user profiles for the dashboard, run the SQL from
 `supabase/profiles.sql` in Supabase SQL Editor.
 
+To enable topic progress tracking, run the SQL from
+`supabase/topic-progress.sql` in Supabase SQL Editor.
+
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.

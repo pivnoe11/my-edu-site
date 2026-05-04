@@ -1,26 +1,6 @@
 import Link from "next/link";
 import Navbar from "../../components/Navbar";
-
-const mechanicsTopics = [
-  {
-    slug: "uniform-motion",
-    title: "Равномерное прямолинейное движение",
-    description:
-      "Скорость, координата, перемещение, графики зависимости, вектор, время движения.",
-  },
-  {
-    slug: "density",
-    title: "Плотность",
-    description:
-      "Масса, объем, плотность, формула плотности, средняя плотность, единицы измерения.",
-  },
-  {
-    slug: "friction",
-    title: "Трение",
-    description:
-      "Сила трения, нормальная реакция, коэффициент трения, трение покоя и скольжения.",
-  },
-];
+import { mechanicsTopics } from "../../lib/topics";
 
 export default function MechanicsPage() {
   return (
@@ -65,6 +45,10 @@ export default function MechanicsPage() {
               <p className="text-base leading-7 text-gray-600">
                 {topic.description}
               </p>
+
+              <div className="mt-6 inline-flex rounded-xl bg-green-800 px-4 py-2 text-sm font-medium text-white transition group-hover:bg-green-900">
+                Начать тему
+              </div>
             </Link>
           ))}
         </div>

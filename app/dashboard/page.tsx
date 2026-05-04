@@ -2,11 +2,18 @@ import { redirect } from "next/navigation";
 import Navbar from "../../components/Navbar";
 import ProfileNameEditor from "../../components/ProfileNameEditor";
 import { createClient } from "@/lib/supabase/server";
+import { getTopicBySlug, mechanicsTopics } from "@/lib/topics";
 
 type Profile = {
   full_name: string | null;
   created_at: string | null;
   updated_at: string | null;
+};
+
+type TopicProgress = {
+  topic_slug: string;
+  status: string;
+  last_opened_at: string;
 };
 
 export const dynamic = "force-dynamic";
@@ -63,9 +70,22 @@ export default async function DashboardPage({
       : null;
   const displayName = profile?.full_name || metadataName || "Ученик";
   const email = user.email ?? "email не указан";
-  const solvedTasks = 0;
-  const progressPercent = 0;
-  const currentTopic = "Выберите тему";
+  const { data: topicProgress } = await supabase
+    .from("user_topic_progress")
+    .select("topic_slug, status, last_opened_at")
+    .eq("user_id", user.id)
+    .order("last_opened_at", { ascending: false })
+    .returns<TopicProgress[]>();
+
+  const startedTopics = topicProgress ?? [];
+  const startedTopicCount = startedTopics.length;
+  const progressPercent = Math.round(
+    (startedTopicCount / mechanicsTopics.length) * 100
+  );
+  const currentTopic =
+    startedTopics.length > 0
+      ? getTopicBySlug(startedTopics[0].topic_slug)?.title ?? "Тема открыта"
+      : "Выберите тему";
 
   return (
     <main className="min-h-screen bg-gray-50 text-black">
@@ -129,8 +149,11 @@ export default async function DashboardPage({
 
             <div className="mt-8 grid gap-3">
               <div className="rounded-2xl bg-white/10 p-4">
-                <p className="text-sm text-gray-300">Решено заданий</p>
-                <p className="mt-1 text-3xl font-bold">{solvedTasks}</p>
+                <p className="text-sm text-gray-300">Начато тем</p>
+                <p className="mt-1 text-3xl font-bold">{startedTopicCount}</p>
+                <p className="mt-1 text-sm text-gray-400">
+                  из {mechanicsTopics.length}
+                </p>
               </div>
 
               <div className="rounded-2xl bg-white/10 p-4">
@@ -143,10 +166,27 @@ export default async function DashboardPage({
 
         <section className="mt-10 rounded-3xl bg-white p-6 shadow-sm">
           <h2 className="text-xl font-semibold">Последние действия</h2>
-          <div className="mt-4 rounded-2xl border border-dashed border-gray-300 p-6 text-gray-600">
-            Пока нет сохранённых действий. Когда появятся задания и темы, здесь
-            будет история обучения.
-          </div>
+          {startedTopics.length > 0 ? (
+            <ul className="mt-4 space-y-3">
+              {startedTopics.slice(0, 3).map((item) => {
+                const topic = getTopicBySlug(item.topic_slug);
+
+                return (
+                  <li
+                    key={item.topic_slug}
+                    className="rounded-2xl border border-gray-200 p-4 text-gray-700"
+                  >
+                    Открыта тема «{topic?.title ?? item.topic_slug}»
+                  </li>
+                );
+              })}
+            </ul>
+          ) : (
+            <div className="mt-4 rounded-2xl border border-dashed border-gray-300 p-6 text-gray-600">
+              Пока нет сохранённых действий. Откройте тему в разделе механики,
+              чтобы здесь появилась история обучения.
+            </div>
+          )}
         </section>
       </section>
     </main>

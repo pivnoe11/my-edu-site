@@ -1,23 +1,7 @@
 import Link from "next/link";
 import Navbar from "../../../components/Navbar";
-
-const topicData: Record<string, { title: string; description: string }> = {
-  "uniform-motion": {
-    title: "Равномерное прямолинейное движение",
-    description:
-      "Здесь будет граф темы: основные понятия, связи между формулами и ключевые определения.",
-  },
-  density: {
-    title: "Плотность",
-    description:
-      "Здесь будет граф темы: масса, объем, плотность и связанные понятия.",
-  },
-  friction: {
-    title: "Трение",
-    description:
-      "Здесь будет граф темы: сила трения, коэффициент трения, реакции опоры.",
-  },
-};
+import { createClient } from "../../../lib/supabase/server";
+import { getTopicBySlug } from "../../../lib/topics";
 
 export default async function TopicGraphPage({
   params,
@@ -25,7 +9,7 @@ export default async function TopicGraphPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const topic = topicData[slug];
+  const topic = getTopicBySlug(slug);
 
   if (!topic) {
     return (
@@ -44,6 +28,31 @@ export default async function TopicGraphPage({
     );
   }
 
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = supabase
+    ? await supabase.auth.getUser()
+    : { data: { user: null } };
+
+  let progressSaved = false;
+
+  if (supabase && user) {
+    const { error } = await supabase.from("user_topic_progress").upsert(
+      {
+        user_id: user.id,
+        topic_slug: topic.slug,
+        status: "started",
+        last_opened_at: new Date().toISOString(),
+      },
+      {
+        onConflict: "user_id,topic_slug",
+      }
+    );
+
+    progressSaved = !error;
+  }
+
   return (
     <main className="min-h-screen bg-[#f4f4f2] text-black">
       <Navbar />
@@ -56,11 +65,21 @@ export default async function TopicGraphPage({
           ← Назад к разделу механики
         </Link>
 
-        <h1 className="text-4xl font-bold md:text-5xl">{topic.title}</h1>
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h1 className="text-4xl font-bold md:text-5xl">{topic.title}</h1>
 
-        <p className="mt-4 max-w-3xl text-lg text-gray-600">
-          {topic.description}
-        </p>
+            <p className="mt-4 max-w-3xl text-lg text-gray-600">
+              {topic.description}
+            </p>
+          </div>
+
+          {progressSaved ? (
+            <div className="rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-800">
+              Прогресс сохранён
+            </div>
+          ) : null}
+        </div>
 
         <div className="mt-10 rounded-3xl border border-dashed border-green-700/40 bg-white p-10 shadow-sm">
           <div className="flex min-h-[420px] items-center justify-center rounded-2xl bg-green-50 text-center text-lg text-green-900">
@@ -71,3 +90,4 @@ export default async function TopicGraphPage({
     </main>
   );
 }
+
