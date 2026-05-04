@@ -97,3 +97,53 @@ export async function signOutAction() {
   redirect("/sign-in");
 }
 
+export async function updateProfileAction(formData: FormData) {
+  const name = getString(formData, "full_name");
+
+  if (!name) {
+    redirectWithError("/dashboard", "Введите имя профиля.");
+  }
+
+  if (name.length > 40) {
+    redirectWithError("/dashboard", "Имя должно быть не длиннее 40 символов.");
+  }
+
+  const supabase = await createClient();
+
+  if (!supabase) {
+    redirectWithError(
+      "/dashboard",
+      "Supabase ещё не настроен. Добавьте переменные окружения."
+    );
+  }
+
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    redirect("/sign-in");
+  }
+
+  const { error: profileError } = await supabase.from("profiles").upsert({
+    id: user.id,
+    full_name: name,
+  });
+
+  if (profileError) {
+    redirectWithError("/dashboard", profileError.message);
+  }
+
+  const { error: metadataError } = await supabase.auth.updateUser({
+    data: {
+      full_name: name,
+    },
+  });
+
+  if (metadataError) {
+    redirectWithError("/dashboard", metadataError.message);
+  }
+
+  redirect("/dashboard?updated=1");
+}

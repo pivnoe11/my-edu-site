@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import Navbar from "../../components/Navbar";
-import { signOutAction } from "../auth/actions";
+import { signOutAction, updateProfileAction } from "../auth/actions";
 import { createClient } from "@/lib/supabase/server";
 
 type Profile = {
@@ -23,7 +23,19 @@ function formatDate(value?: string | null) {
   }).format(new Date(value));
 }
 
-export default async function DashboardPage() {
+type DashboardPageProps = {
+  searchParams?: Promise<{
+    error?: string;
+    updated?: string;
+  }>;
+};
+
+export default async function DashboardPage({
+  searchParams,
+}: DashboardPageProps) {
+  const params = await searchParams;
+  const errorMessage = params?.error;
+  const isUpdated = params?.updated === "1";
   const supabase = await createClient();
 
   if (!supabase) {
@@ -99,6 +111,18 @@ export default async function DashboardPage() {
           <section className="rounded-3xl bg-white p-6 shadow-sm">
             <h2 className="text-xl font-semibold">Аккаунт</h2>
 
+            {isUpdated ? (
+              <div className="mt-5 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+                Профиль обновлён.
+              </div>
+            ) : null}
+
+            {errorMessage ? (
+              <div className="mt-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {errorMessage}
+              </div>
+            ) : null}
+
             <dl className="mt-6 grid gap-4 sm:grid-cols-2">
               <div className="rounded-2xl border border-gray-200 p-4">
                 <dt className="text-sm text-gray-500">Имя</dt>
@@ -126,6 +150,35 @@ export default async function DashboardPage() {
                 </dd>
               </div>
             </dl>
+
+            <form
+              action={updateProfileAction}
+              className="mt-6 rounded-2xl border border-gray-200 bg-gray-50 p-4"
+            >
+              <label
+                htmlFor="full_name"
+                className="block text-sm font-medium text-gray-600"
+              >
+                Изменить имя
+              </label>
+              <div className="mt-3 flex flex-col gap-3 sm:flex-row">
+                <input
+                  id="full_name"
+                  name="full_name"
+                  type="text"
+                  defaultValue={displayName}
+                  required
+                  maxLength={40}
+                  className="min-w-0 flex-1 rounded-xl border border-gray-300 bg-white px-4 py-3 outline-none transition focus:border-black"
+                />
+                <button
+                  type="submit"
+                  className="rounded-xl bg-black px-5 py-3 font-medium text-white transition hover:bg-gray-800"
+                >
+                  Сохранить
+                </button>
+              </div>
+            </form>
           </section>
 
           <section className="rounded-3xl bg-black p-6 text-white shadow-sm">
