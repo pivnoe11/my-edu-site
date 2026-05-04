@@ -76,7 +76,11 @@ export default async function DashboardPage({
   const displayName = profile?.full_name || metadataName || "Ученик";
   const email = user.email ?? "email не указан";
   const joinedAt = profile?.created_at ?? user.created_at;
-  const profileUpdatedAt = profile?.updated_at ?? user.updated_at;
+  const profileUpdatedAt =
+    profile?.updated_at ??
+    (typeof user.user_metadata.full_name === "string"
+      ? user.updated_at
+      : null);
   const solvedTasks = 0;
   const progressPercent = 0;
   const currentTopic = "Выберите тему";

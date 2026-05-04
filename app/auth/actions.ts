@@ -126,15 +126,6 @@ export async function updateProfileAction(formData: FormData) {
     redirect("/sign-in");
   }
 
-  const { error: profileError } = await supabase.from("profiles").upsert({
-    id: user.id,
-    full_name: name,
-  });
-
-  if (profileError) {
-    redirectWithError("/dashboard", profileError.message);
-  }
-
   const { error: metadataError } = await supabase.auth.updateUser({
     data: {
       full_name: name,
@@ -144,6 +135,13 @@ export async function updateProfileAction(formData: FormData) {
   if (metadataError) {
     redirectWithError("/dashboard", metadataError.message);
   }
+
+  await supabase
+    .from("profiles")
+    .update({
+      full_name: name,
+    })
+    .eq("id", user.id);
 
   redirect("/dashboard?updated=1");
 }
