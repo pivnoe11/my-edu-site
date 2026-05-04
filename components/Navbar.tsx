@@ -30,7 +30,7 @@ export default async function Navbar() {
         <nav className="flex items-center gap-6">
           <Link
             href="/sections"
-            className="text-gray-600 transition hover:text-black"
+            className="rounded-xl border border-gray-300 bg-gray-50 px-5 py-2 font-medium text-gray-800 shadow-sm transition hover:-translate-y-0.5 hover:border-black hover:bg-white hover:text-black hover:shadow-md"
           >
             Разделы
           </Link>
