@@ -5,10 +5,12 @@ import { updateProfileAction } from "../app/auth/actions";
 
 type ProfileNameEditorProps = {
   displayName: string;
+  email: string;
 };
 
 export default function ProfileNameEditor({
   displayName,
+  email,
 }: ProfileNameEditorProps) {
   const [isEditing, setIsEditing] = useState(false);
 
@@ -18,6 +20,7 @@ export default function ProfileNameEditor({
         <div className="min-w-0">
           <dt className="text-sm text-gray-500">Имя</dt>
           <dd className="mt-1 truncate text-lg font-semibold">{displayName}</dd>
+          <dd className="mt-1 break-all text-sm text-gray-500">{email}</dd>
         </div>
 
         <button
@@ -57,4 +60,3 @@ export default function ProfileNameEditor({
     </div>
   );
 }
-

@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 import Navbar from "../../components/Navbar";
 import ProfileNameEditor from "../../components/ProfileNameEditor";
-import { signOutAction } from "../auth/actions";
 import { createClient } from "@/lib/supabase/server";
 
 type Profile = {
@@ -11,18 +10,6 @@ type Profile = {
 };
 
 export const dynamic = "force-dynamic";
-
-function formatDate(value?: string | null) {
-  if (!value) {
-    return "пока неизвестно";
-  }
-
-  return new Intl.DateTimeFormat("ru-RU", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  }).format(new Date(value));
-}
 
 type DashboardPageProps = {
   searchParams?: Promise<{
@@ -76,12 +63,6 @@ export default async function DashboardPage({
       : null;
   const displayName = profile?.full_name || metadataName || "Ученик";
   const email = user.email ?? "email не указан";
-  const joinedAt = profile?.created_at ?? user.created_at;
-  const profileUpdatedAt =
-    profile?.updated_at ??
-    (typeof user.user_metadata.full_name === "string"
-      ? user.updated_at
-      : null);
   const solvedTasks = 0;
   const progressPercent = 0;
   const currentTopic = "Выберите тему";
@@ -101,15 +82,6 @@ export default async function DashboardPage({
               Личный кабинет с реальными данными аккаунта.
             </p>
           </div>
-
-          <form action={signOutAction}>
-            <button
-              type="submit"
-              className="rounded-xl border border-gray-300 px-5 py-2 font-medium text-gray-700 transition hover:border-black hover:bg-black hover:text-white"
-            >
-              Выйти
-            </button>
-          </form>
         </div>
 
         <div className="mt-10 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
@@ -128,30 +100,9 @@ export default async function DashboardPage({
               </div>
             ) : null}
 
-            <dl className="mt-6 grid gap-4 sm:grid-cols-2">
+            <dl className="mt-6">
               <div className="rounded-2xl border border-gray-200 p-4">
-                <ProfileNameEditor displayName={displayName} />
-              </div>
-
-              <div className="rounded-2xl border border-gray-200 p-4">
-                <dt className="text-sm text-gray-500">Email</dt>
-                <dd className="mt-1 break-all text-lg font-semibold">
-                  {email}
-                </dd>
-              </div>
-
-              <div className="rounded-2xl border border-gray-200 p-4">
-                <dt className="text-sm text-gray-500">Дата регистрации</dt>
-                <dd className="mt-1 text-lg font-semibold">
-                  {formatDate(joinedAt)}
-                </dd>
-              </div>
-
-              <div className="rounded-2xl border border-gray-200 p-4">
-                <dt className="text-sm text-gray-500">Профиль обновлён</dt>
-                <dd className="mt-1 text-lg font-semibold">
-                  {formatDate(profileUpdatedAt)}
-                </dd>
+                <ProfileNameEditor displayName={displayName} email={email} />
               </div>
             </dl>
 
