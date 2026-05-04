@@ -1,4 +1,5 @@
 import Navbar from "../../components/Navbar";
+import PasswordInput from "../../components/PasswordInput";
 import { signUpAction } from "../auth/actions";
 
 type SignUpPageProps = {
@@ -53,9 +54,8 @@ export default async function SignUpPage({ searchParams }: SignUpPageProps) {
 
             <div>
               <label className="mb-2 block text-sm font-medium">Пароль</label>
-              <input
+              <PasswordInput
                 name="password"
-                type="password"
                 placeholder="Придумайте пароль"
                 required
                 minLength={6}

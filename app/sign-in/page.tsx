@@ -1,4 +1,5 @@
 import Navbar from "../../components/Navbar";
+import PasswordInput from "../../components/PasswordInput";
 import { signInAction } from "../auth/actions";
 
 type SignInPageProps = {
@@ -51,9 +52,8 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
 
             <div>
               <label className="mb-2 block text-sm font-medium">Пароль</label>
-              <input
+              <PasswordInput
                 name="password"
-                type="password"
                 placeholder="Введите пароль"
                 required
                 className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-black"
