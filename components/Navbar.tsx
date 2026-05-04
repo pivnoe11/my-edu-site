@@ -9,6 +9,16 @@ export default async function Navbar() {
     : { data: null };
   const email =
     typeof data?.claims?.email === "string" ? data.claims.email : null;
+  const userMetadata = data?.claims?.user_metadata;
+  const name =
+    userMetadata &&
+    typeof userMetadata === "object" &&
+    "full_name" in userMetadata &&
+    typeof userMetadata.full_name === "string"
+      ? userMetadata.full_name
+      : null;
+  const accountLabel = name || email;
+  const accountInitial = (accountLabel?.trim().charAt(0) || "Я").toUpperCase();
 
   return (
     <header className="border-b border-gray-200 bg-white">
@@ -25,20 +35,30 @@ export default async function Navbar() {
             Разделы
           </Link>
 
-          {email ? (
+          {accountLabel ? (
             <>
               <Link
                 href="/dashboard"
-                className="max-w-[240px] truncate rounded-xl border border-gray-200 px-4 py-2 text-gray-700 transition hover:border-black hover:text-black"
-                title={email}
+                className="flex max-w-[260px] items-center gap-3 rounded-2xl border border-gray-300 bg-gray-50 px-4 py-2 text-gray-900 shadow-sm transition hover:-translate-y-0.5 hover:border-black hover:bg-white hover:shadow-md"
+                title={email || accountLabel}
               >
-                {email}
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-black text-sm font-semibold text-white">
+                  {accountInitial}
+                </span>
+                <span className="min-w-0">
+                  <span className="block truncate text-sm font-semibold leading-4">
+                    {accountLabel}
+                  </span>
+                  <span className="block text-xs leading-4 text-gray-500">
+                    Личный кабинет
+                  </span>
+                </span>
               </Link>
 
               <form action={signOutAction}>
                 <button
                   type="submit"
-                  className="text-gray-600 transition hover:text-black"
+                  className="rounded-xl border border-gray-300 px-5 py-2 font-medium text-gray-700 transition hover:border-black hover:bg-black hover:text-white"
                 >
                   Выйти
                 </button>
